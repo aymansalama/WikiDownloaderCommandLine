@@ -54,8 +54,9 @@ def main():
         dates = 20181101   # default testing
     
     # Projects selection
+    proj = []
     if args.projects:
-        proj = args.projects
+        proj = [args.projects]
     else:
         proj = ['wiki','wikibooks','wiktionary','wikiquote','wikimedia','wikisource','wikinews','wikiversity','wikivoyage']
 
@@ -64,7 +65,7 @@ def main():
     maxretries = 3
     if args.maxretries and int(args.maxretries) >= 0:
         maxretries = int(args.maxretries)
-
+    
 
     # Set the locale
     allLocale = []
@@ -76,8 +77,6 @@ def main():
                 # remove linebreak which is the last character of the string
                 currentPlace = line[:-1]
                 allLocale.append(currentPlace)
-                # print (allLocale)
-
     # I thought need to verify user input first but then I realized no need to verify..
     # if user give wrong input, the regex will not return any matches
 
@@ -95,19 +94,30 @@ def main():
 
 
     locale = allLocale
+    print ('-' * 50, '\n', 'Checking')
+    print("Max retries set to:", maxretries)
+    print("Dumps Domain use:", dumpsdomain)
+    print("Locale selected:", locale)
+    print("Project selected:",proj)
+    print("Dates selected:", dates)
+    print('\n', '-' * 50)
+
+
+
     fulldumps = []
     # Regex to get date from the html page
     for l in locale:
         for p in proj:
             REGEXPROJDATE = r'<a href="(?P<language>%s)(?P<project>%s)/(?P<date>%s)">[^<]+</a>: <span class=\'done\'>Dump complete</span>' % (l, p, dates)
             m = re.compile(REGEXPROJDATE)
+            # print(m)
             for match in re.finditer(m, html):
                 # print(match)
                 fulldumps.append([match.group('language'), match.group('project'),match.group('date')])
     # print(fulldumps)
         
     for locale, project, date in fulldumps:
-        print (('-' * 50, '\n', 'Checking', locale, project, date, '\n', '-' * 50))
+        print ('-' * 50, '\n', 'Checking', locale, project, date, '\n', '-' * 50)
         time.sleep(1)  # ctrl-c
         f = urlopen('%s/%s%s/%s/' % (dumpsdomain, locale, project, date))
         htmlproj = f.read().decode('utf-8')
@@ -127,10 +137,11 @@ def main():
                     urldumps.append('%s/%s' % (dumpsdomain, match.group('urldump')))
                 
                 
-                print (urldumps)
+                # print (urldumps)
                 for urldump in urldumps:
                     dumpfilename = urldump.split('/')[-1]
-                    path = '%s/%s%s' % (dumpfilename[0], locale, project)
+
+                    path = 'Download/%s/%s%s' % (locale, locale, project)
                     if not os.path.exists(path):
                         os.makedirs(path)
                     # wget continue downloadlink log to path with dumpfilename
