@@ -1,17 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# Copyright (C) 2011-2014 WikiTeam
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 
 import argparse
 import os
@@ -25,7 +12,7 @@ from urllib.request import urlopen
 # log
 # md5checker
 
-
+# class 
 def main():
     parser = argparse.ArgumentParser(description='Downloader of Wikimedia Dumps')
     parser.add_argument('-m', '--mirrors', nargs='?', type=int, help='Use mirror links instead of wikimedia. Such as 1:https://dumps.wikimedia.your.org 2:http://wikipedia.c3sl.ufpr.br', required=False)
@@ -35,23 +22,37 @@ def main():
     parser.add_argument('-l', '--locales', nargs='+', help='Choose which language dumps to download (e.g)', required=False)
     args = parser.parse_args()
     
-    
     # Dumps Domain and Mirror
-    if args.mirrors == 1:
+    if args.mirrors == None:
+        dumpsdomain = 'https://dumps.wikimedia.org'
+    elif args.mirrors == 1:
         dumpsdomain = 'https://dumps.wikimedia.your.org'
     elif args.mirrors == 2:
         dumpsdomain = 'http://wikipedia.c3sl.ufpr.br'
     else:
-        dumpsdomain = 'https://dumps.wikimedia.org'
+        while True:
+            secondChance = input("Invalid input for mirror choice.\nInput 1 for dumps.wikimedia.your.org\nInput 2 for wikipedia.c3sl.ufpr.br \
+            \nInput 3 for default: dumps.wikimedia.your.org\n")
+            if secondChance == '1':
+                print(secondChance)
+                dumpsdomain = 'https://dumps.wikimedia.your.org'
+                break
+            elif secondChance == '2':
+                dumpsdomain = 'http://wikipedia.c3sl.ufpr.br'
+                break
+            elif secondChance == '3':
+                dumpsdomain = 'https://dumps.wikimedia.org'
+                break   
+                
 
     with urlopen('{}/backup-index.html'.format(dumpsdomain)) as url:
         html = url.read().decode('utf-8')
 
     # Dumps Date
     if args.dates:
-        dates = args.dates
+        dates = args.dates 
     else:
-        dates = 20181101   # default testing
+        dates = 20181021   # default testing
     
     # Projects selection
     proj = []
@@ -76,30 +77,16 @@ def main():
             for line in filehandle:
                 # remove linebreak which is the last character of the string
                 currentPlace = line[:-1]
-                allLocale.append(currentPlace)
-    # I thought need to verify user input first but then I realized no need to verify..
-    # if user give wrong input, the regex will not return any matches
-
-    # # Get all the locale from wikimedia dumps by the format of [localewiki....]
-    # REGEXLANG = r'<a href="(?P<lang>.*)wi.*/[^<]+</a>: <span class=\'done\'>Dump complete</span>'
-    # m = re.compile(REGEXLANG)
-    # lang = []
-    # for match in re.finditer(m, html):
-    #     lang.append(match.group('lang'))
-    
-    # locale = []
-    # for x in allLocale:
-    #     if x in lang:
-    #         locale.append(x)          
+                allLocale.append(currentPlace)       
 
 
     locale = allLocale
     print ('-' * 50, '\n', 'Checking')
     print("Max retries set to:", maxretries)
     print("Dumps Domain use:", dumpsdomain)
-    print("Locale selected:", locale)
-    print("Project selected:",proj)
     print("Dates selected:", dates)
+    print("Project selected:",proj)
+    print("Locale selected:", locale)
     print('\n', '-' * 50)
 
 
@@ -114,7 +101,12 @@ def main():
             for match in re.finditer(m, html):
                 # print(match)
                 fulldumps.append([match.group('language'), match.group('project'),match.group('date')])
-    # print(fulldumps)
+    
+    # Exit application if no file can be download.
+    if fulldumps == []:
+        print("\nRequested dumps are not available.\nIf server are updating, try again later.\
+        \nEnsure the argument passed are correct.","\n" *3)
+        sys.exit(0)
         
     for locale, project, date in fulldumps:
         print ('-' * 50, '\n', 'Checking', locale, project, date, '\n', '-' * 50)
@@ -130,8 +122,8 @@ def main():
             while (not corrupted) and maxRetriesCheck > 0:
                 maxRetriesCheck -=1
                 # refer "/enwiki/20181101/enwiki-20181101-pages-meta-history1.xml-p26584p28273.7z"
-                m = re.compile(r'<a href="(?P<urldump>/%s%s/%s/%s%s-%s-%s)">' %  (locale,project,date,locale,project,date,dumptypes))
                 # enwiki is have many files, looping is required
+                m = re.compile(r'<a href="(?P<urldump>/%s%s/%s/%s%s-%s-%s)">' %  (locale,project,date,locale,project,date,dumptypes))
                 urldumps = []
                 for match in re.finditer(m, htmlproj):
                     urldumps.append('%s/%s' % (dumpsdomain, match.group('urldump')))
@@ -169,11 +161,12 @@ def main():
                     # print ((md52))
 
                     # if md51 == md52:
-                    #     print ('md5sum is correct for this file, horay! \o/')
+                    #     print ('MD5SUM Check Pass!')
                     #     print ('\n' * 3)
                     #     corrupted = False
                     # else:
                     #     os.remove('%s/%s' % (path, dumpfilename))               
+
 
 if __name__ == '__main__':
     main()
