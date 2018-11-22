@@ -104,10 +104,6 @@ def main():
     print("Locale selected:", locale)
     print('\n', '-' * 50)
 
-
-    with urlopen('{}/backup-index.html'.format(dumpsdomain)) as url:
-        html = url.read().decode('utf-8')
-    
     
     fulldumps = []
     downloadlink = ""
