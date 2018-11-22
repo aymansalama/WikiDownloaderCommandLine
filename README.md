@@ -8,3 +8,5 @@ python wdcli.py [OPTION]
     -p. --projects      e.g: wikipedia, wikibooks, wiktionary, wikimedia, wikinews, wikiversity, wikiquote, wikisource, wikivoyage
     -r, --maxretries    Number of retries. Default = 3
     -l, --locales       Languages e.g. en my ar 
+    
+  ![alt text](https://github.com/aymansalama/WikiDownloaderCommandLine/blob/master/Block%20Diagram%20V3.png)
