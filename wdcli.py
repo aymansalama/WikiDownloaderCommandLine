@@ -9,11 +9,44 @@ import datetime
 import requests
 from requests.exceptions import HTTPError
 from urllib.request import urlopen
+import hashlib
 ### TODOLIST
 # interactive
 # error generator
 # log
 
+def GetMD5sums(url, path = ''):
+	try:
+		raw = urlopen(url).read().decode('utf-8')
+	except:
+		return False
+	
+	f = open('%smd5sums.txt' % (path), 'w')
+	f.write(raw)
+	f.close()
+	print('Checked Before')
+	return True
+
+def ReadMD5(path = ''):
+	try:
+		md5file = open('%smd5sums.txt' % (path), 'r')
+	except:
+		return ''
+	md5raw = md5file.read()
+	md5file.close()
+	return md5raw
+		
+def MatchMD5(file, md5raw):
+	hash_md5 = hashlib.md5()
+	with open(file, "rb") as f:
+		for chunk in iter(lambda: f.read(4096), b""):
+			hash_md5.update(chunk)
+	f = hash_md5.hexdigest()
+	
+	if re.search(f, md5raw):
+		return True
+	else:
+		return False
 
 # class 
 def main():
@@ -66,8 +99,10 @@ def main():
         dates = args.dates
     else:
         # Default first day of the current month
+        # todayDate = datetime.date.today().strftime("%Y%m%d")
         todayDate = datetime.date.today()
-        dates = todayDate.replace(day=1)
+        dates = todayDate.replace(day=1).strftime("%Y%m%d")
+
     
     # Projects selection
     proj = []
@@ -117,7 +152,7 @@ def main():
                 print(downloadlink, '--  Link Ready')
             except HTTPError:
                 print(downloadlink, '--  Not Exist')
-    print(fulldumps)
+    # print(fulldumps)
 
     # Exit application if no file can be download
     if fulldumps == []:
@@ -144,41 +179,25 @@ def main():
                 for match in re.finditer(m, htmlproj):
                     print(match)
                     urldumps.append('%s/%s' % (dumpsdomain, match.group('urldump')))
+
+                path = 'Download/%s/%s%s' % (locale, locale, project)
                 
-                
-                print (urldumps)
+                if not os.path.exists(path):
+                    os.makedirs(path)
+
+                GetMD5sums('%s/%s%s/%s/%s%s-%s-md5sums.txt' % (dumpsdomain, locale, project, date, locale, project, date), '%s/%s-%s-' % (path, project, date))
+                md5raw = ReadMD5('%s/%s-%s-' % (path, project, date))
+
+                # print (urldumps)
                 for urldump in urldumps:
                     dumpfilename = urldump.split('/')[-1]
-
-                    path = 'Download/%s/%s%s' % (locale, locale, project)
-                    if not os.path.exists(path):
-                        os.makedirs(path)
-                    # wget continue downloadlink log to path with dumpfilename
+					
+                    #wget continue downloadlink log to path with dumpfilename
                     os.system('wget --continue %s -O %s/%s' % (urldump, path, dumpfilename))
 
-                    # md5check IN PROGRESS DO NOT DELETE
-                    os.system('md5sum %s/%s > md5' % (path, dumpfilename))
-                    f = open('md5', 'r')
-                    raw = f.read()
-                    f.close()
-                    md51 = re.findall(
-                        r'(?P<md5>[a-f0-9]{32})\s+%s/%s' % (path, dumpfilename), raw)[0]
-                    print ((md51))
-
-                    with urlopen('%s/%s%s/%s/%s%s-%s-md5sums.txt' % (dumpsdomain, locale, project, date, locale, project, date)) as f:
-                        raw = f.read().decode('utf-8')
-
-                    f = open('%s/%s-%s-md5sums.txt' %
-                             (path, project, date), 'w')
-                    f.write(raw)
-                    f.close()
-                    md52 = re.findall(
-                        r'(?P<md5>[a-f0-9]{32})\s+%s' % (dumpfilename), raw)[0]
-                    print ((md52))
-
-                    if md51 == md52:
-                        print ('md5sum Check Pass!')
-                        print ('\n' * 3)
+                    # md5check
+                    if MatchMD5('%s/%s' % (path, dumpfilename), md5raw):
+                        print('Matching MD5')
                         corrupted = False
                     else:
                         os.remove('%s/%s' % (path, dumpfilename))               
