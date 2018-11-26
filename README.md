@@ -1,12 +1,23 @@
 # WikiDownloaderCommandLine
 Download wiki content from command line
 
-Usage:
+Usage
+-----
+
+```
 python wdcli.py [OPTION]
-    -m, --mirrors       Number choice of mirror link consists of US and Brazil e.g: 1
-    -d, --dates         A single data only e.g: 20181101
-    -p. --projects      e.g: wikipedia, wikibooks, wiktionary, wikimedia, wikinews, wikiversity, wikiquote, wikisource, wikivoyage
-    -r, --maxretries    Number of retries. Default = 3
-    -l, --locales       Languages e.g. en my ar 
-    
-  ![alt text](https://github.com/aymansalama/WikiDownloaderCommandLine/blob/master/Block%20Diagram%20V3.png)
+``` 
+- -m, --mirrors &rarr; Number choice of mirror link consists of:  
+                        1:<https://dumps.wikimedia.your.org>  
+                        2:<http://wikipedia.c3sl.ufpr.br>  
+                        3:<https://dumps.wikimedia.org>
+ ```python -m 1```
+
+- -d, --dates   &rarr; A single data only  
+```python wdcli.py -d 20181101 ```
+- -p. --projects &rarr; Type of Projects such as wikipedia(wiki), wikibooks, wiktionary, wikimedia, wikinews,wikiversity, wikiquote, wikisource, wikivoyage  
+```python wdcli.py -p wiki wiktionary```
+- -r, --maxretries &rarr; Number of retries. Default = 3
+```python wdcli.py -r 5```
+- -l, --locales &rarr; Languages
+```python wdcli.py -l en my ar```
