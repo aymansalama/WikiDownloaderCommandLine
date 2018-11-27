@@ -20,4 +20,8 @@ python wdcli.py [OPTION]
 - -r, --maxretries &rarr; Number of retries. Default = 3  
 ```python wdcli.py -r 5```
 - -l, --locales &rarr; Languages  
-```python wdcli.py -l en my ar```
+```python wdcli.py -l en my ar```  
+
+Block Diagram
+-------------
+![blockdiagram](/Block%20diagram%20v4.png)
