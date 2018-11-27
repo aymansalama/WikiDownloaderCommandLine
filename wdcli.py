@@ -15,6 +15,28 @@ import hashlib
 # error generator
 # log
 
+def DownloadFile(url_link, path):
+    file = url_link.split('/')[-1]
+    done = 0
+    total = 0
+    
+    try:
+        url = requests.get(url_link, stream = True)
+        total = int(url.headers.get('content-length'))
+    except:
+        print('link not found')
+        return False
+
+    if url.status_code == 200:
+        with open('%s/%s' % (path, file), 'wb') as f:
+            for chunk in url.iter_content(1024):
+                done += len(chunk)
+                f.write(chunk)
+                sys.stdout.write('\r%s [%.2f]' % (file, done/total*100))
+
+        sys.stdout.write('\r%s completed' % (file))
+        return True
+
 def GetMD5sums(url):
 	try:
 		raw = urlopen(url).read().decode('utf-8')
@@ -184,10 +206,7 @@ def main():
                 
                 # print (urldumps)
                 for urldump in urldumps:
-                    dumpfilename = urldump.split('/')[-1]
-					
-                    #wget continue downloadlink log to path with dumpfilename
-                    os.system('wget --continue %s -O %s/%s' % (urldump, path, dumpfilename))
+                    DownloadFile('%s' % (urldump), '%s' % (path))
 
                     # md5check
                     if MatchMD5('%s/%s' % (path, dumpfilename), md5raw):
