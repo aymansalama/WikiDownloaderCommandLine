@@ -16,6 +16,12 @@ from urllib.request import urlopen
 
 mirrors = ['https://dumps.wikimedia.org','https://dumps.wikimedia.your.org','http://wikipedia.c3sl.ufpr.br']
 projects = ['wiki','wikibooks','wiktionary','wikiquote','wikimedia','wikisource','wikinews','wikiversity','wikivoyage']
+locales = list()
+with open('./wikilocale.txt', 'r') as filehandle:
+    for line in filehandle:
+        # remove linebreak which is the last character of the string
+        currentPlace = line[:-1]
+        locales.append(currentPlace)
 
 def select_mirrors(mirror):
     mirror_string = ''
@@ -32,6 +38,7 @@ def select_mirrors(mirror):
         if mirror is None:
             mirror = input('Select Mirrors: \n' + mirror_string + '(leave empty for default) \n').replace(' ','')
 
+        mirror = str(mirror)
         if mirror is '':
             mirror = mirrors[0]
             break
@@ -56,6 +63,7 @@ def select_dates(date):
         if date is None:
             date = input('Enter Date: (leave empty for default)\n').replace(' ','')
 
+        date = str(date)
         if date is '':
             date = datetime.date.today().replace(day=1)
             break
@@ -72,6 +80,66 @@ def select_dates(date):
 
 
 def select_projects(project):
+    project_string = ''
+    i = 1
+
+    for p in projects:
+        project_string = project_string + str(i) + ': ' + p + '\n';
+        i += 1
+
+    while True:
+        if project is None:
+            project = input('Select projects:\n' + project_string + '(leave empty for default)\n').split(' ')
+
+            if project is '':
+                return projects
+            else:
+                pass
+        else:
+            if type(project) is str:
+                project = project.split(' ')
+
+            if checkProject(project):
+                return project
+            else:
+                project = None
+                print('\nInvalid selection of projects. Please try again.')
+
+
+def select_locale(locale):
+    while True:
+        if locale is None:
+            locale = input('Select locale: (leave empty for default "en")\n').split(' ')
+
+            if locale is '':
+                locale = []
+                locale.append('en')
+                return locale
+            else:
+                pass
+        else:
+            if type(locale) is str:
+                locale = locale.split(' ')
+                
+            if checkLocale(locale):
+                return locale
+            else:
+                project = None
+                print('\nInvalid selection of locales. Please try again.')
+
+
+def checkProject(project):
+    for p in project:
+        if p not in projects:
+            return False
+    return True
+
+
+def checkLocale(locale):
+    for l in locale:
+        if l not in locales:
+            return False
+    return True
 
 
 # class
@@ -90,13 +158,13 @@ def main():
     # Dumps Date, default latest
     dates = select_dates(args.dates)
 
-
     # Projects selection
-    proj = []
-    if args.projects:
-        proj = [args.projects]
-    else:
-        proj = ['wiki','wikibooks','wiktionary','wikiquote','wikimedia','wikisource','wikinews','wikiversity','wikivoyage']
+    proj = select_projects(args.projects)
+    # proj = []
+    # if args.projects:
+    #     proj = [args.projects]
+    # else:
+    #     proj = ['wiki','wikibooks','wiktionary','wikiquote','wikimedia','wikisource','wikinews','wikiversity','wikivoyage']
 
     # Retry downloads when MD5 checker not match
     # Default = 3
@@ -106,15 +174,16 @@ def main():
 
 
     # Set the locale
-    allLocale = []
-    if args.locales:
-        allLocale = args.locales
-    else:
-        with open('wikilocale.txt', 'r') as filehandle:
-            for line in filehandle:
-                # remove linebreak which is the last character of the string
-                currentPlace = line[:-1]
-                allLocale.append(currentPlace)
+    allLocale = select_locale(args.locales)
+    # allLocale = []
+    # if args.locales:
+    #     allLocale = args.locales
+    # else:
+    #     with open('wikilocale.txt', 'r') as filehandle:
+    #         for line in filehandle:
+    #             # remove linebreak which is the last character of the string
+    #             currentPlace = line[:-1]
+    #             allLocale.append(currentPlace)
 
 
     locale = allLocale
