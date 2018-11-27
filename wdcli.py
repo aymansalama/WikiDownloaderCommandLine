@@ -81,11 +81,9 @@ def select_dates(date):
 
 def select_projects(project):
     project_string = ''
-    i = 1
 
     for p in projects:
-        project_string = project_string + str(i) + ': ' + p + '\n';
-        i += 1
+        project_string = project_string + p + '\n';
 
     while True:
         if project is None:
@@ -124,7 +122,7 @@ def select_locale(locale):
             if checkLocale(locale):
                 return locale
             else:
-                project = None
+                locale = None
                 print('\nInvalid selection of locales. Please try again.')
 
 
@@ -149,7 +147,7 @@ def main():
     parser.add_argument('-d', '--dates', nargs='?', type=int, help='Set the date of the dumps. (e.g. 20181101). Default = 1st day of current month', required=False)
     parser.add_argument('-p', '--projects', help='Choose which wikimedia projects to download (e.g. all, wikipedia, wikibooks, wiktionary, wikimedia, wikinews, wikiversity, wikiquote, wikisource, wikivoyage)', required=False)
     parser.add_argument('-r', '--maxretries', help='Max retries to download a dump when md5sum doesn\'t fit. Default: 3', required=False)
-    parser.add_argument('-l', '--locales', nargs='+', help='Choose which language dumps to download (e.g en my ar)', required=False)
+    parser.add_argument('-l', '--locales', help='Choose which language dumps to download (e.g en my ar)', required=False)
     args = parser.parse_args()
 
     # Dumps Domain and Mirror
