@@ -89,9 +89,9 @@ def select_projects(project):
 
     while True:
         if project is None:
-            project = input('Select projects:\n' + project_string + '(leave empty for default)\n').split(' ')
+            project = input('Select projects:\n' + project_string + '(leave empty for default)\n').split()
 
-            if project is '':
+            if not project:
                 return projects
             else:
                 pass
@@ -109,9 +109,9 @@ def select_projects(project):
 def select_locale(locale):
     while True:
         if locale is None:
-            locale = input('Select locale: (leave empty for default "en")\n').split(' ')
+            locale = input('Select locale: (leave empty for default "en")\n').split()
 
-            if locale is '':
+            if not locale:
                 locale = []
                 locale.append('en')
                 return locale
@@ -120,7 +120,7 @@ def select_locale(locale):
         else:
             if type(locale) is str:
                 locale = locale.split(' ')
-                
+
             if checkLocale(locale):
                 return locale
             else:
