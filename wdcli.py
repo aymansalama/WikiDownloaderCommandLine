@@ -15,34 +15,25 @@ import hashlib
 # error generator
 # log
 
-def GetMD5sums(url, path = ''):
+def GetMD5sums(url):
 	try:
 		raw = urlopen(url).read().decode('utf-8')
 	except:
-		return False
-	
-	f = open('%smd5sums.txt' % (path), 'w')
-	f.write(raw)
-	f.close()
-	print('Checked Before')
-	return True
-
-def ReadMD5(path = ''):
-	try:
-		md5file = open('%smd5sums.txt' % (path), 'r')
-	except:
 		return ''
-	md5raw = md5file.read()
-	md5file.close()
-	return md5raw
-		
+	
+	return raw
+
 def MatchMD5(file, md5raw):
 	hash_md5 = hashlib.md5()
-	with open(file, "rb") as f:
-		for chunk in iter(lambda: f.read(4096), b""):
-			hash_md5.update(chunk)
+	try:
+		with open(file, "rb") as f:
+			for chunk in iter(lambda: f.read(4096), b""):
+				hash_md5.update(chunk)
+	except:
+		return False
+
 	f = hash_md5.hexdigest()
-	
+
 	if re.search(f, md5raw):
 		return True
 	else:
@@ -185,9 +176,12 @@ def main():
                 if not os.path.exists(path):
                     os.makedirs(path)
 
-                GetMD5sums('%s/%s%s/%s/%s%s-%s-md5sums.txt' % (dumpsdomain, locale, project, date, locale, project, date), '%s/%s-%s-' % (path, project, date))
-                md5raw = ReadMD5('%s/%s-%s-' % (path, project, date))
-
+                md5raw = GetMD5sums('%s/%s%s/%s/%s%s-%s-md5sums.txt' % (dumpsdomain, locale, project, date, locale, project, date))
+                if not md5raw:
+                    print('md5sums link not found')
+                else:
+                    print('md5sums link found')
+                
                 # print (urldumps)
                 for urldump in urldumps:
                     dumpfilename = urldump.split('/')[-1]
