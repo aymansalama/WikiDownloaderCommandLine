@@ -142,7 +142,7 @@ def checkLocale(locale):
 
 
 
-def DownloadFile(dumpfilename, url_link, path):
+def DownloadFile(url_link, path, dumpfilename)
     done = 0
     total = 0
 
@@ -160,7 +160,7 @@ def DownloadFile(dumpfilename, url_link, path):
                 f.write(chunk)
                 sys.stdout.write('\r%s [%.2f]' % (dumpfilename, done/total*100))
 
-        sys.stdout.write('\r%s Completed' % (dumpfilename))
+        print('\n%s [Completed]' % (dumpfilename))
         return True
 
 
@@ -282,7 +282,7 @@ def main():
                 # print (urldumps)
                 for urldump in urldumps:
                     dumpfilename = urldump.split('/')[-1]
-                    DownloadFile(dumpfilename, urldump,path)
+                    DownloadFile(urldump, path, dumpfilename)
 
                     # md5check
                     if MatchMD5('%s/%s' % (path, dumpfilename), md5raw):
