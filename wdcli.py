@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import subprocess
 import os
 import sys
 import time
@@ -218,7 +219,16 @@ def main():
             else:
                 print(file, "-- Skipped")
 
-
+    # Download torrents using torrent client
+    for torrent_file in torrent_file_paths:
+        if sys.platform.startswith('darwin'):
+            subprocess.call(('open', torrent_file))
+        elif os.name == 'nt':
+            # Windows
+            os.startfile(torrent_file)
+        elif os.name == 'posix':
+            # Linux & Macintosh
+            subprocess.call(('xdg-open', torrent_file))
 
 
     # Exit application if no mirror file can be download
