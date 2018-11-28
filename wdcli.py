@@ -15,11 +15,138 @@ import hashlib
 # error generator
 # log
 
+mirrors = ['https://dumps.wikimedia.org','https://dumps.wikimedia.your.org','http://wikipedia.c3sl.ufpr.br']
+projects = ['wiki','wikibooks','wiktionary','wikiquote','wikimedia','wikisource','wikinews','wikiversity','wikivoyage']
+locales = list()
+with open('./wikilocale.txt', 'r') as filehandle:
+    for line in filehandle:
+        # remove linebreak which is the last character of the string
+        currentPlace = line[:-1]
+        locales.append(currentPlace)
+
+def select_mirrors(mirror):
+    mirror_string = ''
+    i = 1
+
+    for m in mirrors:
+        mirror_string = mirror_string + str(i) + ': ' + m + ' '
+        if i is 1:
+            mirror_string += '(default)'
+        mirror_string += '\n'
+        i += 1
+
+    while True:
+        if mirror is None:
+            mirror = input('Select Mirrors: \n' + mirror_string + '(leave empty for default) \n').replace(' ','')
+
+        mirror = str(mirror)
+        if mirror is '':
+            mirror = mirrors[0]
+            break
+        elif mirror is '1':
+            mirror = mirrors[0]
+            break
+        elif mirror is '2':
+            mirror = mirrors[1]
+            break
+        elif mirror is '3':
+            mirror = mirrors[2]
+            break
+        else:
+            mirror = None
+            print('Invalid input. Please try again\n')
+
+    return mirror
+
+
+def select_dates(date):
+    while True:
+        if date is None:
+            date = input('Enter Date: (leave empty for default)\n').replace(' ','')
+
+        date = str(date)
+        if date is '':
+            date = datetime.date.today().replace(day=1)
+            break
+        elif len(str(date)) < 8 or len(str(date)) > 8:
+            date = None
+            print('\nWrong date format! Please enter as YYYYMMDD format.\n')
+        elif int(date) > int(datetime.date.today().strftime("%Y%m%d")):
+            date = None
+            print('\nUh Oh! Dumps are not from the future.\n')
+        else:
+            break
+
+    return str(date).replace('-','')
+
+
+def select_projects(project):
+    project_string = ''
+
+    for p in projects:
+        project_string = project_string + p + '\n';
+
+    while True:
+        if project is None:
+            project = input('Select projects:\n' + project_string + '(leave empty for default)\n').split()
+
+            if not project:
+                return projects
+            else:
+                pass
+        else:
+            if type(project) is str:
+                project = project.split(' ')
+
+            if checkProject(project):
+                return project
+            else:
+                project = None
+                print('\nInvalid selection of projects. Please try again.')
+
+
+def select_locale(locale):
+    while True:
+        if locale is None:
+            locale = input('Select locale: (leave empty for default "en")\n').split()
+
+            if not locale:
+                locale = []
+                locale.append('en')
+                return locale
+            else:
+                pass
+        else:
+            if type(locale) is str:
+                locale = locale.split(' ')
+
+            if checkLocale(locale):
+                return locale
+            else:
+                locale = None
+                print('\nInvalid selection of locales. Please try again.')
+
+
+def checkProject(project):
+    for p in project:
+        if p not in projects:
+            return False
+    return True
+
+
+def checkLocale(locale):
+    for l in locale:
+        if l not in locales:
+            return False
+    return True
+
+
+
 def DownloadFile(url_link, path):
     file = url_link.split('/')[-1]
     done = 0
     total = 0
-    
+
     try:
         url = requests.get(url_link, stream = True)
         total = int(url.headers.get('content-length'))
@@ -37,13 +164,15 @@ def DownloadFile(url_link, path):
         sys.stdout.write('\r%s completed' % (file))
         return True
 
+
 def GetMD5sums(url):
 	try:
 		raw = urlopen(url).read().decode('utf-8')
 	except:
 		return ''
-	
+
 	return raw
+
 
 def MatchMD5(file, md5raw):
 	hash_md5 = hashlib.md5()
@@ -61,86 +190,33 @@ def MatchMD5(file, md5raw):
 	else:
 		return False
 
-# class 
+# class
 def main():
     parser = argparse.ArgumentParser(description='Downloader of Wikimedia Dumps')
     parser.add_argument('-m', '--mirrors', nargs='?', type=int, help='Use mirror links instead of wikimedia. Such as 1:https://dumps.wikimedia.your.org 2:http://wikipedia.c3sl.ufpr.br', required=False)
     parser.add_argument('-d', '--dates', nargs='?', type=int, help='Set the date of the dumps. (e.g. 20181101). Default = 1st day of current month', required=False)
     parser.add_argument('-p', '--projects', help='Choose which wikimedia projects to download (e.g. all, wikipedia, wikibooks, wiktionary, wikimedia, wikinews, wikiversity, wikiquote, wikisource, wikivoyage)', required=False)
     parser.add_argument('-r', '--maxretries', help='Max retries to download a dump when md5sum doesn\'t fit. Default: 3', required=False)
-    parser.add_argument('-l', '--locales', nargs='+', help='Choose which language dumps to download (e.g en my ar)', required=False)
+    parser.add_argument('-l', '--locales', help='Choose which language dumps to download (e.g en my ar)', required=False)
     args = parser.parse_args()
-    
+
     # Dumps Domain and Mirror
-    if args.mirrors == None:
-        dumpsdomain = 'https://dumps.wikimedia.org'
-    elif args.mirrors == 1:
-        dumpsdomain = 'https://dumps.wikimedia.your.org'
-    elif args.mirrors == 2:
-        dumpsdomain = 'http://wikipedia.c3sl.ufpr.br'
-    else:
-        # Exception Handling for wrong input for mirror choices
-        while True:
-            secondChance = input("Invalid input for mirror choice.\nInput 1 for dumps.wikimedia.your.org\nInput 2 for wikipedia.c3sl.ufpr.br \
-            \nInput 3 for default: dumps.wikimedia.your.org\n")
-            if secondChance == '1':
-                print(secondChance)
-                dumpsdomain = 'https://dumps.wikimedia.your.org'
-                break
-            elif secondChance == '2':
-                dumpsdomain = 'http://wikipedia.c3sl.ufpr.br'
-                break
-            elif secondChance == '3':
-                dumpsdomain = 'https://dumps.wikimedia.org'
-                break   
-                
+    dumpsdomain = select_mirrors(args.mirrors)
 
+    # Dumps Date, default latest
+    dates = select_dates(args.dates)
 
-    # Dumps Date, default latest 
-    if args.dates:
-        # Input format exception handling
-        if  len(str(args.dates)) < 8 or\
-            len(str(args.dates)) > 8:
-                print(len(str(args.dates)))
-                print("\nWrong date format! Please enter as YYYYMMDD format.\n")
-                sys.exit(0)
-        # Stop if the date not in the past
-        if  args.dates > int(datetime.date.today().strftime("%Y%m%d")):
-            print("\nUh Oh! Dumps are not from the future.\n")
-            sys.exit(0)
-
-        dates = args.dates
-    else:
-        # Default first day of the current month
-        # todayDate = datetime.date.today().strftime("%Y%m%d")
-        todayDate = datetime.date.today()
-        dates = todayDate.replace(day=1).strftime("%Y%m%d")
-
-    
     # Projects selection
-    proj = []
-    if args.projects:
-        proj = [args.projects]
-    else:
-        proj = ['wiki','wikibooks','wiktionary','wikiquote','wikimedia','wikisource','wikinews','wikiversity','wikivoyage']
+    proj = select_projects(args.projects)
 
     # Retry downloads when MD5 checker not match
     # Default = 3
     maxretries = 3
     if args.maxretries and int(args.maxretries) >= 0:
         maxretries = int(args.maxretries)
-    
 
     # Set the locale
-    allLocale = []
-    if args.locales:
-        allLocale = args.locales
-    else:
-        with open('wikilocale.txt', 'r') as filehandle:
-            for line in filehandle:
-                # remove linebreak which is the last character of the string
-                currentPlace = line[:-1]
-                allLocale.append(currentPlace)       
+    allLocale = select_locale(args.locales)
 
 
     locale = allLocale
@@ -152,7 +228,7 @@ def main():
     print("Locale selected:", locale)
     print('\n', '-' * 50)
 
-    
+
     fulldumps = []
     downloadlink = ""
     for l in locale:
@@ -172,7 +248,7 @@ def main():
         print("\nRequested dumps are not available.\nIf server are updating, try again later.\
         \nEnsure the argument passed are correct.","\n" *3)
         sys.exit(0)
-        
+
     for locale, project, date in fulldumps:
         print ('-' * 50, '\n', 'Preparing to download', '\n', '-' * 50)
         time.sleep(1)  # ctrl-c
@@ -194,7 +270,7 @@ def main():
                     urldumps.append('%s/%s' % (dumpsdomain, match.group('urldump')))
 
                 path = 'Download/%s/%s%s' % (locale, locale, project)
-                
+
                 if not os.path.exists(path):
                     os.makedirs(path)
 
@@ -203,7 +279,7 @@ def main():
                     print('md5sums link not found')
                 else:
                     print('md5sums link found')
-                
+
                 # print (urldumps)
                 for urldump in urldumps:
                     DownloadFile('%s' % (urldump), '%s' % (path))
@@ -213,7 +289,7 @@ def main():
                         print('Matching MD5')
                         corrupted = False
                     else:
-                        os.remove('%s/%s' % (path, dumpfilename))               
+                        os.remove('%s/%s' % (path, dumpfilename))
 
 
 if __name__ == '__main__':
