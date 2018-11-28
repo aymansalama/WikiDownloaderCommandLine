@@ -23,7 +23,7 @@ python wdcli.py [OPTION]
                         3:<https://dumps.wikimedia.org>  
  ```python -m 1```
 
-- -d, --dates   &rarr; A single data only  
+- -d, --dates   &rarr; A single date only  
 ```python wdcli.py -d 20181101 ```
 - -p. --projects &rarr; Type of Projects such as wikipedia(wiki), wikibooks, wiktionary, wikimedia, wikinews,wikiversity, wikiquote, wikisource, wikivoyage  
 ```python wdcli.py -p wiki wiktionary```
@@ -31,6 +31,9 @@ python wdcli.py [OPTION]
 ```python wdcli.py -r 5```
 - -l, --locales &rarr; Languages  
 ```python wdcli.py -l en my ar```  
+- -t, --torrent &rarr; Use torrents instead of mirror to download dumb, all other arguments are the same.
+```python wdcli.py -t```
+
 
 Block Diagram
 -------------
