@@ -9,11 +9,20 @@ import datetime
 import requests
 from requests.exceptions import HTTPError
 from urllib.request import urlopen
+from urllib.request import urlretrieve
 import hashlib
+from bs4 import BeautifulSoup
+from gi.repository import GLib
 ### TODOLIST
 # interactive
 # error generator
 # log
+
+"""
+def DownloadTorrentFile(url_link, path):
+    file = '{}/{}'.format(path, url_link.split('/')[-1])
+    print(url_link)
+    urlretrieve(url_link, file) """
 
 def DownloadFile(url_link, path):
     file = url_link.split('/')[-1]
@@ -65,15 +74,19 @@ def MatchMD5(file, md5raw):
 def main():
     parser = argparse.ArgumentParser(description='Downloader of Wikimedia Dumps')
     parser.add_argument('-m', '--mirrors', nargs='?', type=int, help='Use mirror links instead of wikimedia. Such as 1:https://dumps.wikimedia.your.org 2:http://wikipedia.c3sl.ufpr.br', required=False)
+    parser.add_argument('-t', '--torrent', help="Use torrent to download data", action='store_true')
     parser.add_argument('-d', '--dates', nargs='?', type=int, help='Set the date of the dumps. (e.g. 20181101). Default = 1st day of current month', required=False)
     parser.add_argument('-p', '--projects', help='Choose which wikimedia projects to download (e.g. all, wikipedia, wikibooks, wiktionary, wikimedia, wikinews, wikiversity, wikiquote, wikisource, wikivoyage)', required=False)
     parser.add_argument('-r', '--maxretries', help='Max retries to download a dump when md5sum doesn\'t fit. Default: 3', required=False)
     parser.add_argument('-l', '--locales', nargs='+', help='Choose which language dumps to download (e.g en my ar)', required=False)
     args = parser.parse_args()
-    
+
     # Dumps Domain and Mirror
     if args.mirrors == None:
-        dumpsdomain = 'https://dumps.wikimedia.org'
+        if args.torrent:
+            dumpsdomain = "https://tools.wmflabs.org"
+        else:
+            dumpsdomain = 'https://dumps.wikimedia.org'
     elif args.mirrors == 1:
         dumpsdomain = 'https://dumps.wikimedia.your.org'
     elif args.mirrors == 2:
@@ -152,68 +165,110 @@ def main():
     print("Locale selected:", locale)
     print('\n', '-' * 50)
 
+    if not args.torrent:
+        fulldumps = []
+        downloadlink = ""
+        for l in locale:
+            for p in proj:
+                try:
+                    downloadlink = '{}/{}{}/{}'.format(dumpsdomain, l, p, dates)
+                    r = requests.get(downloadlink)
+                    r.raise_for_status()
+                    fulldumps.append([l,p,dates])
+                    print(downloadlink, '--  Link Ready')
+                except HTTPError:
+                    print(downloadlink, '--  Not Exist')
+        # print(fulldumps)
     
-    fulldumps = []
-    downloadlink = ""
-    for l in locale:
-        for p in proj:
-            try:
-                downloadlink = '{}/{}{}/{}'.format(dumpsdomain, l, p, dates)
-                r = requests.get(downloadlink)
-                r.raise_for_status()
-                fulldumps.append([l,p,dates])
-                print(downloadlink, '--  Link Ready')
-            except HTTPError:
-                print(downloadlink, '--  Not Exist')
-    # print(fulldumps)
+    if args.torrent:
+        # Retrieve torrent file using provided data
+        # Source: https://tools.wmflabs.org/dump-torrents/
+        links = []
+        for l in locale:
+            for p in proj:
+                try:
+                    downloadlink = '{}/dump-torrents/{}{}/{}'.format(dumpsdomain, l, p, dates)
+                    r = requests.get(downloadlink)
+                    r.raise_for_status()
+                    links.append(downloadlink)
+                    print(downloadlink, '-- Link Ready')
+                except HTTPError:
+                    print(downloadlink, '-- Not Exist')
 
-    # Exit application if no file can be download
-    if fulldumps == []:
-        print("\nRequested dumps are not available.\nIf server are updating, try again later.\
-        \nEnsure the argument passed are correct.","\n" *3)
-        sys.exit(0)
+    # Proceed to download all torrent files in above link
+    print ('-' * 50, '\n', 'Preparing to download torrent files', '\n', '-' * 50)
+    time.sleep(1)  # ctrl-c
+    torrent_file_paths = []
+    for link in links:
+        print(link)
+
+        with urlopen(link) as url:
+            html = url.read().decode('utf-8')
+   
+        parsedPage = BeautifulSoup(html, "html.parser")
         
-    for locale, project, date in fulldumps:
-        print ('-' * 50, '\n', 'Preparing to download', '\n', '-' * 50)
-        time.sleep(1)  # ctrl-c
-        print(downloadlink)
-        with urlopen(downloadlink) as url:
-            htmlproj = url.read().decode('utf-8')
+        for a in parsedPage.findAll(href=re.compile("\.torrent$")):
+            file_url = '{}{}'.format(dumpsdomain, a.get('href'))
+            downloads_dir = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOWNLOAD)
+            file = '{}/{}'.format(downloads_dir, file_url.split('/')[-1])
 
-        for dumptypes in ['pages-meta-history\d*\.xml[^\.]*\.7z']:
-            corrupted = True
-            maxRetriesCheck = maxretries
-            while (corrupted) and maxRetriesCheck > 0:
-                maxRetriesCheck -=1
-                # refer "/enwiki/20181101/enwiki-20181101-pages-meta-history1.xml-p26584p28273.7z"
-                # enwiki is have many files, looping is required
-                m = re.compile(r'<a href="/(?P<urldump>%s%s/%s/%s%s-%s-%s)">' %  (locale,project,date,locale,project,date,dumptypes))
-                urldumps = []
-                for match in re.finditer(m, htmlproj):
-                    print(match)
-                    urldumps.append('%s/%s' % (dumpsdomain, match.group('urldump')))
+            if DownloadFile(file_url, downloads_dir):
+                print(file, "-- Downloaded")
+                torrent_file_paths.append(file)
+            else:
+                print(file, "-- Skipped")
 
-                path = 'Download/%s/%s%s' % (locale, locale, project)
-                
-                if not os.path.exists(path):
-                    os.makedirs(path)
 
-                md5raw = GetMD5sums('%s/%s%s/%s/%s%s-%s-md5sums.txt' % (dumpsdomain, locale, project, date, locale, project, date))
-                if not md5raw:
-                    print('md5sums link not found')
-                else:
-                    print('md5sums link found')
-                
-                # print (urldumps)
-                for urldump in urldumps:
-                    DownloadFile('%s' % (urldump), '%s' % (path))
 
-                    # md5check
-                    if MatchMD5('%s/%s' % (path, dumpfilename), md5raw):
-                        print('Matching MD5')
-                        corrupted = False
+
+    # Exit application if no mirror file can be download
+    if not args.torrent:
+        if fulldumps == []:
+            print("\nRequested dumps are not available.\nIf server are updating, try again later.\
+            \nEnsure the argument passed are correct.","\n" *3)
+            sys.exit(0)
+        
+        for locale, project, date in fulldumps:
+            print ('-' * 50, '\n', 'Preparing to download', '\n', '-' * 50)
+            time.sleep(1)  # ctrl-c
+            print(downloadlink)
+            with urlopen(downloadlink) as url:
+                htmlproj = url.read().decode('utf-8')
+
+            for dumptypes in ['pages-meta-history\d*\.xml[^\.]*\.7z']:
+                corrupted = True
+                maxRetriesCheck = maxretries
+                while (corrupted) and maxRetriesCheck > 0:
+                    maxRetriesCheck -=1
+                    # refer "/enwiki/20181101/enwiki-20181101-pages-meta-history1.xml-p26584p28273.7z"
+                    # enwiki is have many files, looping is required
+                    m = re.compile(r'<a href="/(?P<urldump>%s%s/%s/%s%s-%s-%s)">' %  (locale,project,date,locale,project,date,dumptypes))
+                    urldumps = []
+                    for match in re.finditer(m, htmlproj):
+                        print(match)
+                        urldumps.append('%s/%s' % (dumpsdomain, match.group('urldump')))
+
+                    path = 'Download/%s/%s%s' % (locale, locale, project)
+                    
+                    if not os.path.exists(path):
+                        os.makedirs(path)
+
+                    md5raw = GetMD5sums('%s/%s%s/%s/%s%s-%s-md5sums.txt' % (dumpsdomain, locale, project, date, locale, project, date))
+                    if not md5raw:
+                        print('md5sums link not found')
                     else:
-                        os.remove('%s/%s' % (path, dumpfilename))               
+                        print('md5sums link found')
+                    
+                    # print (urldumps)
+                    for urldump in urldumps:
+                        DownloadFile('%s' % (urldump), '%s' % (path))
+
+                        # md5check
+                        if MatchMD5('%s/%s' % (path, dumpfilename), md5raw):
+                            print('Matching MD5')
+                            corrupted = False
+                        else:
+                            os.remove('%s/%s' % (path, dumpfilename))               
 
 
 if __name__ == '__main__':
