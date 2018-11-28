@@ -10,11 +10,13 @@ import requests
 from requests.exceptions import HTTPError
 from urllib.request import urlopen
 import hashlib
+import logging
 ### TODOLIST
 # interactive
 # error generator
 # log
 
+logging.basicConfig(filename='logfile.txt', filemode='a', format='%(asctime)s %(message)s', datefmt='%Y/%m/%d %I:%M:%S %p', level=logging.INFO)
 mirrors = ['https://dumps.wikimedia.org','https://dumps.wikimedia.your.org','http://wikipedia.c3sl.ufpr.br']
 projects = ['wiki','wikibooks','wiktionary','wikiquote','wikimedia','wikisource','wikinews','wikiversity','wikivoyage']
 locales = list()
@@ -160,6 +162,7 @@ def DownloadFile(url_link, path, dumpfilename):
                 f.write(chunk)
                 sys.stdout.write('\r%s [%.2f]' % (dumpfilename, done/total*100))
 
+        logging.info('%s [Completed]' % (dumpfilename))
         print('\n%s [Completed]' % (dumpfilename))
         return True
 
@@ -275,9 +278,9 @@ def main():
 
                 md5raw = GetMD5sums('%s/%s%s/%s/%s%s-%s-md5sums.txt' % (dumpsdomain, locale, project, date, locale, project, date))
                 if not md5raw:
-                    print('md5sums link not found')
+                    logging.error("md5sums link not found")
                 else:
-                    print('md5sums link found')
+                    logging.info("md5sums link found")
 
                 # print (urldumps)
                 for urldump in urldumps:
@@ -286,9 +289,10 @@ def main():
 
                     # md5check
                     if MatchMD5('%s/%s' % (path, dumpfilename), md5raw):
-                        print('Matching MD5')
+                        logging.info("Matching MD5")
                         corrupted = False
                     else:
+                        logging.error("Not matching MD5")
                         os.remove('%s/%s' % (path, dumpfilename))
 
 
