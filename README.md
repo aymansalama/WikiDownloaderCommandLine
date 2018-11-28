@@ -4,11 +4,11 @@ Download wiki content from command line
 Prerequisites
 ------------
 - Python 3 environment and requests, hashlib, datetime, urllib modules  
-- wget  
+<!-- - wget  
 - md5sum  
 
 For Windows, install ![wget](https://sourceforge.net/projects/gnuwin32/files/wget/1.11.4-1/)
-and [add into path](https://www.addictivetips.com/windows-tips/install-and-use-wget-in-windows-10/)  
+and [add into path](https://www.addictivetips.com/windows-tips/install-and-use-wget-in-windows-10/)   -->
 
 
 Usage
