@@ -142,7 +142,7 @@ def checkLocale(locale):
 
 
 
-def DownloadFile(url_link, path, dumpfilename)
+def DownloadFile(url_link, path, dumpfilename):
     done = 0
     total = 0
 
