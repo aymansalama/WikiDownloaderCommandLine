@@ -8,6 +8,7 @@ import time
 import re       # regex
 import datetime
 import requests
+import ssl
 from requests.exceptions import HTTPError
 from urllib.request import urlopen
 from urllib.request import urlretrieve
@@ -192,18 +193,28 @@ def main():
     # Proceed to download all torrent files in above link
     print ('-' * 50, '\n', 'Preparing to download torrent files', '\n', '-' * 50)
     time.sleep(1)  # ctrl-c
+
+    # Create downloads folder
+    downloads_dir = "/Downloads"
+    if not os.path.exists(downloads_dir):
+        os.mkdir(downloads_dir)
+
     torrent_file_paths = []
     for link in links:
         print(link)
 
-        with urlopen(link) as url:
+        # Skip SSL certification check
+        ctxt = ssl.create_default_context()
+        ctxt.check_hostname = False
+        ctxt.verify_mode = ssl.CERT_NONE
+
+        with urlopen(link, context=ctxt) as url:
             html = url.read().decode('utf-8')
 
         parsedPage = BeautifulSoup(html, "html.parser")
 
-        for a in parsedPage.findAll(href=re.compile("\.torrent$")):
+        for a in parsedPage.findAll(href=re.compile("pages-articles")):
             file_url = '{}{}'.format(dumpsdomain, a.get('href'))
-            downloads_dir = "/Downloads"
             file = '{}/{}'.format(downloads_dir, file_url.split('/')[-1])
 
             if DownloadFile(file_url, downloads_dir):
