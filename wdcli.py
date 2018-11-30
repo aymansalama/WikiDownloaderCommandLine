@@ -13,23 +13,16 @@ from urllib.request import urlopen
 from urllib.request import urlretrieve
 import hashlib
 from bs4 import BeautifulSoup
-from gi.repository import GLib
 ### TODOLIST
 # interactive
 # error generator
 # log
 
-"""
-def DownloadTorrentFile(url_link, path):
-    file = '{}/{}'.format(path, url_link.split('/')[-1])
-    print(url_link)
-    urlretrieve(url_link, file) """
-
 def DownloadFile(url_link, path):
     file = url_link.split('/')[-1]
     done = 0
     total = 0
-    
+
     try:
         url = requests.get(url_link, stream = True)
         total = int(url.headers.get('content-length'))
@@ -52,7 +45,7 @@ def GetMD5sums(url):
 		raw = urlopen(url).read().decode('utf-8')
 	except:
 		return ''
-	
+
 	return raw
 
 def MatchMD5(file, md5raw):
@@ -71,7 +64,7 @@ def MatchMD5(file, md5raw):
 	else:
 		return False
 
-# class 
+# class
 def main():
     parser = argparse.ArgumentParser(description='Downloader of Wikimedia Dumps')
     parser.add_argument('-m', '--mirrors', nargs='?', type=int, help='Use mirror links instead of wikimedia. Such as 1:https://dumps.wikimedia.your.org 2:http://wikipedia.c3sl.ufpr.br', required=False)
@@ -106,11 +99,11 @@ def main():
                 break
             elif secondChance == '3':
                 dumpsdomain = 'https://dumps.wikimedia.org'
-                break   
-                
+                break
 
 
-    # Dumps Date, default latest 
+
+    # Dumps Date, default latest
     if args.dates:
         # Input format exception handling
         if  len(str(args.dates)) < 8 or\
@@ -130,7 +123,7 @@ def main():
         todayDate = datetime.date.today()
         dates = todayDate.replace(day=1).strftime("%Y%m%d")
 
-    
+
     # Projects selection
     proj = []
     if args.projects:
@@ -143,7 +136,7 @@ def main():
     maxretries = 3
     if args.maxretries and int(args.maxretries) >= 0:
         maxretries = int(args.maxretries)
-    
+
 
     # Set the locale
     allLocale = []
@@ -154,7 +147,7 @@ def main():
             for line in filehandle:
                 # remove linebreak which is the last character of the string
                 currentPlace = line[:-1]
-                allLocale.append(currentPlace)       
+                allLocale.append(currentPlace)
 
 
     locale = allLocale
@@ -180,7 +173,7 @@ def main():
                 except HTTPError:
                     print(downloadlink, '--  Not Exist')
         # print(fulldumps)
-    
+
     if args.torrent:
         # Retrieve torrent file using provided data
         # Source: https://tools.wmflabs.org/dump-torrents/
@@ -205,12 +198,12 @@ def main():
 
         with urlopen(link) as url:
             html = url.read().decode('utf-8')
-   
+
         parsedPage = BeautifulSoup(html, "html.parser")
-        
+
         for a in parsedPage.findAll(href=re.compile("\.torrent$")):
             file_url = '{}{}'.format(dumpsdomain, a.get('href'))
-            downloads_dir = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOWNLOAD)
+            downloads_dir = "/Downloads"
             file = '{}/{}'.format(downloads_dir, file_url.split('/')[-1])
 
             if DownloadFile(file_url, downloads_dir):
@@ -237,7 +230,7 @@ def main():
             print("\nRequested dumps are not available.\nIf server are updating, try again later.\
             \nEnsure the argument passed are correct.","\n" *3)
             sys.exit(0)
-        
+
         for locale, project, date in fulldumps:
             print ('-' * 50, '\n', 'Preparing to download', '\n', '-' * 50)
             time.sleep(1)  # ctrl-c
@@ -259,7 +252,7 @@ def main():
                         urldumps.append('%s/%s' % (dumpsdomain, match.group('urldump')))
 
                     path = 'Download/%s/%s%s' % (locale, locale, project)
-                    
+
                     if not os.path.exists(path):
                         os.makedirs(path)
 
@@ -268,7 +261,7 @@ def main():
                         print('md5sums link not found')
                     else:
                         print('md5sums link found')
-                    
+
                     # print (urldumps)
                     for urldump in urldumps:
                         DownloadFile('%s' % (urldump), '%s' % (path))
@@ -278,7 +271,7 @@ def main():
                             print('Matching MD5')
                             corrupted = False
                         else:
-                            os.remove('%s/%s' % (path, dumpfilename))               
+                            os.remove('%s/%s' % (path, dumpfilename))
 
 
 if __name__ == '__main__':
