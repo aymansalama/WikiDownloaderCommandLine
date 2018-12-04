@@ -46,16 +46,16 @@ def select_mirrors(mirror):
             mirror = input('Select Mirrors: \n' + mirror_string + '(leave empty for default) \n').replace(' ','')
 
         mirror = str(mirror)
-        if mirror is '':
+        if mirror == '':
             mirror = mirrors[0]
             break
-        elif mirror is '1':
+        elif mirror == '1':
             mirror = mirrors[0]
             break
-        elif mirror is '2':
+        elif mirror == '2':
             mirror = mirrors[1]
             break
-        elif mirror is '3':
+        elif mirror == '3':
             mirror = mirrors[2]
             break
         else:
@@ -71,7 +71,7 @@ def select_dates(date):
             date = input('Enter Date: (leave empty for default)\n').replace(' ','')
 
         date = str(date)
-        if date is '':
+        if date == '':
             date = datetime.date.today().replace(day=1)
             break
         elif len(str(date)) < 8 or len(str(date)) > 8:
