@@ -1,48 +1,20 @@
 #!/usr/bin/env python3
-try:
-    import argparse
-except ImportError:
-    print("Please install argparse module.")
-    sys.exit(1)
+
+import argparse
 import subprocess
 import os
 import sys
 import time
 import re       # regex
 import datetime
-try:
-    import requests
-except ImportError:
-    print("Please install Requests module.")
-    sys.exit(1) 
-try:
-    import ssl
-except ImportError:
-    print("Please install ssl module.")
-    sys.exit(1) 
-try:
-    from requests.exceptions import HTTPError
-except ImportError:
-    print("Please install HTPPError module.")
-    sys.exit(1) 
-try:
-    from urllib.request import urlopen
-except ImportError:
-    print("Please install urlopen module.")
-    sys.exit(1) 
-try:
-    from urllib.request import urlretrieve
-except ImportError:
-    print("Please install urlretrieve module.")
-    sys.exit(1) 
-try:
-    from bs4 import BeautifulSoup
-except ImportError:
-    print("Please install BeautifulSoup module.")
-    sys.exit(1) 
+import requests
+import ssl
+from requests.exceptions import HTTPError
+from urllib.request import urlopen
+from urllib.request import urlretrieve
+from bs4 import BeautifulSoup
 import hashlib
 import logging
-
 
 # Logging with append mode into logfile.txt
 logging.basicConfig(filename='logfile.txt', filemode='a', format='%(asctime)s %(message)s', datefmt='%Y/%m/%d %I:%M:%S %p', level=logging.INFO)
