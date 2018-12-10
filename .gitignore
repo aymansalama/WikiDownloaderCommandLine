@@ -3,3 +3,8 @@ Download/*
 DownloadTorrent/*
 md5
 logfile.txt
+*.pyc
+*.json
+logfile.txt
+logfile.txt
+logfile.txt
