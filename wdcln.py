@@ -88,14 +88,15 @@ def main():
 
     
     fulldumps = []
+    downloadlink = ""
     try:
-        downloadlink = '%s/%s%s/%s' % (dumpsdomain, locale, project, date)
-        requests.get(downloadlink)
-        # r.raise_for_status()
+        downloadlink = "%s/%s%s/%s" % (dumpsdomain, locale, project, date)
+        r = requests.get(downloadlink)
+        r.raise_for_status()
         fulldumps.append([locale,project,date])
         # print('Link : %s -- Ready' % downloadlink)
     except HTTPError:
-        print('HTTPError')
+        print(r.statuscode)
 
     # Exit application if no file can be download
     if fulldumps == []:

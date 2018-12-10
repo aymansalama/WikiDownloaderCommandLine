@@ -3831,3 +3831,5 @@
 2018/12/10 06:12:08 PM Link found: https://dumps.wikimedia.your.org/tetwikimedia/20180901-> Mirror:https://dumps.wikimedia.your.org, Project:wikimedia, Date:20180901, Locale:tet
 2018/12/10 06:12:44 PM Link found: https://dumps.wikimedia.org//-> Mirror:https://dumps.wikimedia.org, Project:, Date:, Locale:
 2018/12/10 06:14:10 PM Link found: https://dumps.wikimedia.your.org/abwiki/20181101-> Mirror:https://dumps.wikimedia.your.org, Project:wiki, Date:20181101, Locale:ab
+2018/12/11 12:01:58 AM Link found: https://dumps.wikimedia.your.org/enwiki/20181101-> Mirror:https://dumps.wikimedia.your.org, Project:wiki, Date:20181101, Locale:en
+2018/12/11 12:02:00 AM Link found: https://dumps.wikimedia.your.org/afwiki/20181101-> Mirror:https://dumps.wikimedia.your.org, Project:wiki, Date:20181101, Locale:af
