@@ -1,0 +1,10 @@
+
+*.pyc
+*.pyc
+*.json
+.vscode/launch.json
+__pycache__/test_wdcli.cpython-37.pyc
+__pycache__/wdcli.cpython-37.pyc
+*.json
+.vscode/launch.json
+__pycache__/test_wdcli.cpython-37.pyc
