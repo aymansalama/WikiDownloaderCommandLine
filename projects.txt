@@ -1,0 +1,9 @@
+wiki
+wikibooks
+wiktionary
+wikiquote
+wikimedia
+wikisource
+wikinews
+wikiversity
+wikivoyage
