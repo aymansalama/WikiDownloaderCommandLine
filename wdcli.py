@@ -15,14 +15,18 @@ from urllib.request import urlretrieve
 from bs4 import BeautifulSoup
 import hashlib
 import logging
-### TODOLIST
-# interactive
-# error generator
-# log
 
+# Logging with append mode into logfile.txt
 logging.basicConfig(filename='logfile.txt', filemode='a', format='%(asctime)s %(message)s', datefmt='%Y/%m/%d %I:%M:%S %p', level=logging.INFO)
+
+# init of global variables
+# List of mirrors
 mirrors = ['https://dumps.wikimedia.org','https://dumps.wikimedia.your.org','http://wikipedia.c3sl.ufpr.br']
+
+# Default projects
 projects = ['wiki','wikibooks','wiktionary','wikiquote','wikimedia','wikisource','wikinews','wikiversity','wikivoyage']
+
+# Get default locales extracted from wikimedia dumps from a file
 locales = list()
 with open('./wikilocale.txt', 'r') as filehandle:
     for line in filehandle:
@@ -30,10 +34,11 @@ with open('./wikilocale.txt', 'r') as filehandle:
         currentPlace = line[:-1]
         locales.append(currentPlace)
 
+# Set Mirror function
 def select_mirrors(mirror):
     mirror_string = ''
     i = 1
-
+    # toString function to prompt user selection of mirrors list
     for m in mirrors:
         mirror_string = mirror_string + str(i) + ': ' + m + ' '
         if i is 1:
@@ -41,147 +46,183 @@ def select_mirrors(mirror):
         mirror_string += '\n'
         i += 1
 
+    # Error Handling if improper input given by user
     while True:
         if mirror is None:
             mirror = input('Select Mirrors: \n' + mirror_string + '(leave empty for default) \n').replace(' ','')
 
+        # user leave empty by default
         mirror = str(mirror)
         if mirror is '':
             mirror = mirrors[0]
             break
-        elif mirror is '1':
+        # user pick mirror 1 also default
+        elif mirror == '1':
             mirror = mirrors[0]
             break
-        elif mirror is '2':
+        # user pick mirror 2 which is from your.org server
+        elif mirror == '2':
             mirror = mirrors[1]
             break
-        elif mirror is '3':
+        # user pick mirror 3 which is from c3sl,ufpr.pr server
+        elif mirror == '3':
             mirror = mirrors[2]
             break
+        # restart back the loop, empty the variables
         else:
             mirror = None
             print('Invalid input. Please try again\n')
-
+    # user that know what they're doing
     return mirror
 
-
+# Set Date function
 def select_dates(date):
     while True:
+        # no date given in the command argument options
         if date is None:
-            date = input('Enter Date: (leave empty for default)\n').replace(' ','')
+            date = input('Enter Date in YYYYMMDD format: (leave empty for default)\n').replace(' ','')
 
         date = str(date)
+        # default date is the first day of the month
         if date is '':
             date = datetime.date.today().replace(day=1)
             break
+        # check the date format using length of the date
         elif len(str(date)) < 8 or len(str(date)) > 8:
             date = None
             print('\nWrong date format! Please enter as YYYYMMDD format.\n')
+        # if the date given is from the future
         elif int(date) > int(datetime.date.today().strftime("%Y%m%d")):
             date = None
             print('\nUh Oh! Dumps are not from the future.\n')
+        # simple check each piece of date in terms of year month day format
+        elif (int(date[0:4]) < 2013) or  (int(date[4:6]) > 12) or (int(date[6:8]) > 31):
+            date = None
+            print('Your date might be incorrect somewhere. Try again.\n')
         else:
             break
-
+    # user that knows how to rtfm 
     return str(date).replace('-','')
 
-
+# Set Projects function
 def select_projects(project):
+    # toString function to prompt user selection of mirrors list
     project_string = ''
-
     for p in projects:
-        project_string = project_string + p + '\n';
+        project_string = project_string + p + '\n'
 
+    # prompt user until project is selected by typing the right project name
     while True:
         if project is None:
             project = input('Select projects:\n' + project_string + '(leave empty for default)\n').split()
 
+            # empty input = default (all projects)
             if not project:
                 return projects
             else:
                 pass
+        # if user state any projects     
         else:
+            # project name must be a string
             if type(project) is str:
                 project = project.split(' ')
-
+            # check project given by user
             if checkProject(project):
                 return project
+            # invalid project or unsupported project input
             else:
                 project = None
                 print('\nInvalid selection of projects. Please try again.')
 
-
+# Set Language/locale function
 def select_locale(locale):
     while True:
+        # locale is not defined in the command arguments
         if locale is None:
             locale = input('Select locale: (leave empty for default "en")\n').split()
-
+            # default locale is 'en'
             if not locale:
                 locale = []
                 locale.append('en')
                 return locale
             else:
                 pass
+        # user pass their own choice of locale(s)
         else:
             if type(locale) is str:
                 locale = locale.split(' ')
-
+            # check locale given by user
             if checkLocale(locale):
+                # return all proper locale
                 return locale
+            # maybe the user does not know what is locale
             else:
                 locale = None
                 print('\nInvalid selection of locales. Please try again.')
 
-
+# check if the user input right/wrong project name
 def checkProject(project):
     for p in project:
         if p not in projects:
             return False
     return True
 
-
+# check if the user input right/wrong locales compared to default locales
 def checkLocale(locale):
     for l in locale:
         if l not in locales:
             return False
     return True
 
-
-
+# Direct Download dumps function
+# url_link is the file link from the server
+# path is download directory to save the file
+# dumpfilename is derived from the dumps file name 
 def DownloadFile(url_link, path, dumpfilename):
     done = 0
     total = 0
 
+    # error handling in case the link does not work
     try:
         url = requests.get(url_link, stream = True)
+        # to use as total percentage counter when downloading the file 
         total = int(url.headers.get('content-length'))
     except:
         print('link not found')
         return False
 
+    # if the url sucessfully retrieved, download the file
+    # also updates the download progress percentage counter
     if url.status_code == 200:
         with open('%s/%s' % (path, dumpfilename), 'wb') as f:
             for chunk in url.iter_content(1024):
                 done += len(chunk)
                 f.write(chunk)
                 sys.stdout.write('\r%s [%.2f]' % (dumpfilename, done/total*100))
-
+        # log when complete download a dump file
         logging.info('%s [Completed]' % (dumpfilename))
         print('\n%s [Completed]' % (dumpfilename))
         return True
 
+# Torrent Download dumps function
+# url_link is the link from torrent domain
+# path is download directory for torrent file
 def DownloadTorrentFile(url_link, path):
     file = url_link.split('/')[-1]
     done = 0
     total = 0
 
+    # error handling in case the link does not work
     try:
         url = requests.get(url_link, stream = True)
+        # to use as total percentage counter when downloading the file 
         total = int(url.headers.get('content-length'))
     except:
         print('link not found')
         return False
 
+    # if the url sucessfully retrieved, download the torrent file
+    # also updates the download progress percentage counter
     if url.status_code == 200:
         with open('%s/%s' % (path, file), 'wb') as f:
             for chunk in url.iter_content(1024):
@@ -192,7 +233,7 @@ def DownloadTorrentFile(url_link, path):
         sys.stdout.write('\r%s completed' % (file))
         return True
 
-
+# Download md5 hash file from the wikimedia to check md5
 def GetMD5sums(url):
 	try:
 		raw = urlopen(url).read().decode('utf-8')
@@ -201,7 +242,7 @@ def GetMD5sums(url):
 
 	return raw
 
-
+# Compare MD5 hash from downloaded file with the MD5 from wikimedia
 def MatchMD5(file, md5raw):
 	hash_md5 = hashlib.md5()
 	try:
@@ -219,21 +260,28 @@ def MatchMD5(file, md5raw):
 		return False
 
 
+# This function disables SSL certificate verification when opening links.
 def get_context():
-    # This function disables SSL certificate verification when opening links.
     context = ssl.create_default_context()
     context.check_hostname = False
     context.verify_mode = ssl.CERT_NONE
     return context
 
-# class
+# Main function
 def main():
+    # setup arguments
     parser = argparse.ArgumentParser(description='Downloader of Wikimedia Dumps')
+    # mirror, pass only one or nothing as options in int 
     parser.add_argument('-m', '--mirrors', nargs='?', type=int, help='Use mirror links instead of wikimedia. Such as 1:https://dumps.wikimedia.your.org 2:http://wikipedia.c3sl.ufpr.br', required=False)
+    # torrent, if -t options is passed. mirror will use torrent 
     parser.add_argument('-t', '--torrent', help="Use torrent to download data", action='store_true')
+    # dates, pass only one or nothing as options in int
     parser.add_argument('-d', '--dates', nargs='?', type=int, help='Set the date of the dumps. (e.g. 20181101). Default = 1st day of current month', required=False)
-    parser.add_argument('-p', '--projects', help='Choose which wikimedia projects to download (e.g. all, wikipedia, wikibooks, wiktionary, wikimedia, wikinews, wikiversity, wikiquote, wikisource, wikivoyage)', required=False)
-    parser.add_argument('-r', '--maxretries', help='Max retries to download a dump when md5sum doesn\'t fit. Default: 3', required=False)
+    # projects, pass 1 or more as options in string
+    parser.add_argument('-p', '--projects', help='Choose which wikimedia projects to download (e.g. wiki wikibooks wiktionary wikimedia wikinews wikiversity wikiquote wikisource wikivoyage)', required=False)
+    # maxretries, pass one or nothing as options in int
+    parser.add_argument('-r', '--maxretries', nargs='?', type=int, help='Max retries to download a dump when md5sum doesn\'t fit. Default: 3', required=False)
+    # locales, pass one or more as options in str
     parser.add_argument('-l', '--locales', help='Choose which language dumps to download (e.g en my ar)', required=False)
     args = parser.parse_args()
 
@@ -256,10 +304,9 @@ def main():
         maxretries = int(args.maxretries)
 
     # Set the locale
-    allLocale = select_locale(args.locales)
-
-
-    locale = allLocale
+    locale = select_locale(args.locales)
+    
+    # Show users all the selected options
     print ('-' * 50, '\n', 'Checking')
     print("Max retries set to:", maxretries)
     print("Dumps Domain use:", dumpsdomain)
@@ -268,6 +315,8 @@ def main():
     print("Locale selected:", locale)
     print('\n', '-' * 50)
 
+    # check download via direct or torrent
+    # download via torrent
     if args.torrent:
         # Retrieve torrent file using provided data
         # Source: https://tools.wmflabs.org/dump-torrents/
@@ -287,8 +336,8 @@ def main():
         print ('-' * 50, '\n', 'Preparing to download torrent files', '\n', '-' * 50)
         time.sleep(1)  # ctrl-c
 
-        # Create downloads folder
-        downloads_dir = "/Downloads"
+        # Create torrent downloads folder
+        downloads_dir = "DownloadTorrent"
         if not os.path.exists(downloads_dir):
             os.mkdir(downloads_dir)
 
@@ -325,21 +374,22 @@ def main():
                 # Linux & Macintosh
                 subprocess.call(('xdg-open', torrent_file))
 
+
+    # When torrent is not selected
     else:
-        # When torrent is not selected
         fulldumps = []
         downloadlink = ""
+        # check links status for each locale and project
         for l in locale:
             for p in proj:
                 try:
                     downloadlink = '{}/{}{}/{}'.format(dumpsdomain, l, p, dates)
                     r = requests.get(downloadlink)
                     r.raise_for_status()
-                    fulldumps.append([l,p,dates])
+                    fulldumps.append([l,p,dates])   # live link will be added to array
                     print(downloadlink, '--  Link Ready')
                 except HTTPError:
                     print(downloadlink, '--  Not Exist')
-        # print(fulldumps)
 
         # Exit application if no file can be download
         if fulldumps == []:
@@ -347,6 +397,7 @@ def main():
             \nEnsure the argument passed are correct.","\n" *3)
             sys.exit(0)
 
+        # extract live links and loop each link to download the file
         for locale, project, date in fulldumps:
             print ('-' * 50, '\n', 'Preparing to download', '\n', '-' * 50)
             time.sleep(1)  # ctrl-c
@@ -354,24 +405,27 @@ def main():
             with urlopen(downloadlink, context=get_context()) as url:
                 htmlproj = url.read().decode('utf-8')
 
-            for dumptypes in ['pages-meta-history\d*\.xml[^\.]*\.7z']:
+            # refer "/enwiki/20181101/enwiki-20181101-pages-articles2.xml-p30304p88444.bz2"
+            # some dumps have multiple files, loop each file found in the html page using regex
+            for dumptypes in ['pages-articles\d*\.xml[^\.]*\.bz2']:
                 corrupted = True
                 maxRetriesCheck = maxretries
+                # loop until finished retries and no corrupted file
                 while (corrupted) and maxRetriesCheck > 0:
                     maxRetriesCheck -=1
-                    # refer "/enwiki/20181101/enwiki-20181101-pages-meta-history1.xml-p26584p28273.7z"
-                    # enwiki is have many files, looping is required
                     m = re.compile(r'<a href="/(?P<urldump>%s%s/%s/%s%s-%s-%s)">' %  (locale,project,date,locale,project,date,dumptypes))
                     urldumps = []
                     for match in re.finditer(m, htmlproj):
-                        print(match)
                         urldumps.append('%s/%s' % (dumpsdomain, match.group('urldump')))
-
+                    
+                    # Download Directory 
                     path = 'Download/%s/%s%s' % (locale, locale, project)
 
+                    # Create downloads folder
                     if not os.path.exists(path):
                         os.makedirs(path)
 
+                    # Get MD5Sums from wikimedia related to the dumps that will are downloaded
                     md5raw = GetMD5sums('%s/%s%s/%s/%s%s-%s-md5sums.txt' % (dumpsdomain, locale, project, date, locale, project, date))
                     if not md5raw:
                         logging.error("md5sums link not found")
@@ -381,16 +435,19 @@ def main():
                     # print (urldumps)
                     for urldump in urldumps:
                         dumpfilename = urldump.split('/')[-1]
+                        # start download the dumps
                         DownloadFile(urldump, path, dumpfilename)
 
                         # md5check
                         if MatchMD5('%s/%s' % (path, dumpfilename), md5raw):
+                            # log info
                             logging.info("Matching MD5")
                             corrupted = False
                         else:
+                            # md5 not match , log error
                             logging.error("Not matching MD5")
+                            # remove corrupted file
                             os.remove('%s/%s' % (path, dumpfilename))
-
 
 if __name__ == '__main__':
     main()

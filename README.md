@@ -1,14 +1,9 @@
 # WikiDownloaderCommandLine
-Download wiki content from command line
+Download wiki content via command line
 
 Prerequisites
 ------------
-- Python 3 environment and requests, hashlib, datetime, urllib modules  
-<!-- - wget  
-- md5sum  
-
-For Windows, install ![wget](https://sourceforge.net/projects/gnuwin32/files/wget/1.11.4-1/)
-and [add into path](https://www.addictivetips.com/windows-tips/install-and-use-wget-in-windows-10/)   -->
+- Python 3 environment and modules such as:   argparse, subprocess, os, sys, time, re, datetime, ssl, requests, bs4, hashlib, logging, modules  
 
 
 Usage
@@ -31,7 +26,7 @@ python wdcli.py [OPTION]
 ```python wdcli.py -r 5```
 - -l, --locales &rarr; Languages  
 ```python wdcli.py -l "en my ar"```  
-- -t, --torrent &rarr; Use torrents instead of mirror to download dumb, all other arguments are the same.
+- -t, --torrent &rarr; Use torrents instead of mirror to download dump, all other arguments are the same.
 ```python wdcli.py -t```
 
 

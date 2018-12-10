@@ -1,3 +1,5 @@
 # exclude download files
 Download/*
+DownloadTorrent/*
 md5
+logfile.txt

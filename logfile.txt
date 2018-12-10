@@ -1,0 +1,4 @@
+2018/12/10 03:42:59 PM md5sums link found
+2018/12/10 03:43:58 PM enwikiquote-20181201-pages-articles.xml.bz2 [Completed]
+2018/12/10 03:43:58 PM Matching MD5
+2018/12/10 03:45:54 PM md5sums link found
