@@ -186,7 +186,7 @@ def DownloadFile(url_link, path, dumpfilename):
     try:
         url = requests.get(url_link, stream = True)
         # to use as total percentage counter when downloading the file 
-        total = int(url.headers.get('content-length'))
+        total = float(url.headers.get('content-length'))
     except:
         print('link not found')
         return False
@@ -198,7 +198,7 @@ def DownloadFile(url_link, path, dumpfilename):
             for chunk in url.iter_content(1024):
                 done += len(chunk)
                 f.write(chunk)
-                sys.stdout.write('\r%s [%.2f]' % (dumpfilename, done/total*100))
+                sys.stdout.write('\r%s [%.2f]' % (dumpfilename, done*100/total))
         # log when complete download a dump file
         logging.info('%s [Completed]' % (dumpfilename))
         print('\n%s [Completed]' % (dumpfilename))
@@ -216,7 +216,7 @@ def DownloadTorrentFile(url_link, path):
     try:
         url = requests.get(url_link, stream = True)
         # to use as total percentage counter when downloading the file 
-        total = int(url.headers.get('content-length'))
+        total = float(url.headers.get('content-length'))
     except:
         print('link not found')
         return False
@@ -228,7 +228,7 @@ def DownloadTorrentFile(url_link, path):
             for chunk in url.iter_content(1024):
                 done += len(chunk)
                 f.write(chunk)
-                sys.stdout.write('\r%s [%.2f]' % (file, done/total*100))
+                sys.stdout.write('\r%s [%.2f]' % (file, done*100/total))
 
         sys.stdout.write('\r%s completed' % (file))
         return True
