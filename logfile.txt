@@ -1,4 +1,23 @@
-2018/12/10 03:42:59 PM md5sums link found
-2018/12/10 03:43:58 PM enwikiquote-20181201-pages-articles.xml.bz2 [Completed]
-2018/12/10 03:43:58 PM Matching MD5
-2018/12/10 03:45:54 PM md5sums link found
+2018/12/11 11:12:20 AM Pass Automation Test Link: https://dumps.wikimedia.org/enwiki/20181101-> Mirror:https://dumps.wikimedia.org, Project:wiki, Date:20181101, Locale:en
+2018/12/11 11:12:22 AM Pass Automation Test Link: https://dumps.wikimedia.org/afwiki/20181101-> Mirror:https://dumps.wikimedia.org, Project:wiki, Date:20181101, Locale:af
+2018/12/11 11:12:24 AM Pass Automation Test Link: https://dumps.wikimedia.org/amwiki/20181101-> Mirror:https://dumps.wikimedia.org, Project:wiki, Date:20181101, Locale:am
+2018/12/11 11:12:26 AM Pass Automation Test Link: https://dumps.wikimedia.org/angwiki/20181101-> Mirror:https://dumps.wikimedia.org, Project:wiki, Date:20181101, Locale:ang
+2018/12/11 11:12:28 AM Pass Automation Test Link: https://dumps.wikimedia.org/arcwiki/20181101-> Mirror:https://dumps.wikimedia.org, Project:wiki, Date:20181101, Locale:arc
+2018/12/11 11:12:31 AM Pass Automation Test Link: https://dumps.wikimedia.org/arwiki/20181101-> Mirror:https://dumps.wikimedia.org, Project:wiki, Date:20181101, Locale:ar
+2018/12/11 11:12:58 AM Pass Automation Test Link: https://dumps.wikimedia.org/enwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:en
+2018/12/11 11:13:00 AM Error Automation Test Link: https://dumps.wikimedia.org/afwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:af
+2018/12/11 11:13:01 AM Error Automation Test Link: https://dumps.wikimedia.org/amwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:am
+2018/12/11 11:13:03 AM Error Automation Test Link: https://dumps.wikimedia.org/angwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:ang
+2018/12/11 11:13:10 AM Error Automation Test Link: https://dumps.wikimedia.org/anwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:an
+2018/12/11 11:13:12 AM Error Automation Test Link: https://dumps.wikimedia.org/arcwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:arc
+2018/12/11 11:13:14 AM Error Automation Test Link: https://dumps.wikimedia.org/arwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:ar
+2018/12/11 11:13:15 AM Error Automation Test Link: https://dumps.wikimedia.org/arzwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:arz
+2018/12/11 11:13:17 AM Error Automation Test Link: https://dumps.wikimedia.org/astwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:ast
+2018/12/11 11:13:18 AM Error Automation Test Link: https://dumps.wikimedia.org/aswikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:as
+2018/12/11 11:13:21 AM Error Automation Test Link: https://dumps.wikimedia.org/atjwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:atj
+2018/12/11 11:13:23 AM Error Automation Test Link: https://dumps.wikimedia.org/avwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:av
+2018/12/11 11:13:25 AM Error Automation Test Link: https://dumps.wikimedia.org/aywikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:ay
+2018/12/11 11:13:26 AM Error Automation Test Link: https://dumps.wikimedia.org/azbwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:azb
+2018/12/11 11:13:28 AM Error Automation Test Link: https://dumps.wikimedia.org/azwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:az
+2018/12/11 11:13:29 AM Error Automation Test Link: https://dumps.wikimedia.org/barwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:bar
+2018/12/11 11:13:32 AM Error Automation Test Link: https://dumps.wikimedia.org/bclwikivoyage/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikivoyage, Date:20181101, Locale:bcl
