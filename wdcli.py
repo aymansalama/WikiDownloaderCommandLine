@@ -283,8 +283,8 @@ def main():
     parser.add_argument('-r', '--maxretries', nargs='?', type=int, help='Max retries to download a dump when md5sum doesn\'t fit. Default: 3', required=False)
     # locales, pass one or more as options in str
     parser.add_argument('-l', '--locales', help='Choose which language dumps to download (e.g en my ar)', required=False)
-    # Automation test trigger
-    parser.add_argument('-f', '--testflag', nargs='?', type=int, help='----', required=False)
+    # script-testing, if -s options is passed, dumps link status return without download file
+    parser.add_argument('-s', '--script', help="For automated testing using script that will return link status in output file", action='store_true')
     args = parser.parse_args()
 
     # Dumps Domain and Mirror
@@ -390,8 +390,14 @@ def main():
                     r.raise_for_status()
                     fulldumps.append([l,p,dates])   # live link will be added to array
                     print(downloadlink, '--  Link Ready')
+                    if args.script:
+                        logging.info('Pass Automation Test Link: %s-> Mirror:%s, Project:%s, Date:%s, Locale:%s' % (downloadlink, dumpsdomain, p, dates, l))
+                        sys.exit(0)
                 except HTTPError:
                     print(downloadlink, '--  Not Exist')
+                    if args.script:
+                        logging.error('Error Automation Test Link: %s-> Mirror:%s, Project:%s, Date:%s, Locale:%s' % (downloadlink, dumpsdomain, p, dates, l))
+                        sys.exit(0)
 
         # Exit application if no file can be download
         if fulldumps == []:
@@ -401,11 +407,6 @@ def main():
 
         # extract live links and loop each link to download the file
         for locale, project, date in fulldumps:
-            if args.testflag == 0:
-                time.sleep(1)  # ctrl-c
-                print('********Link found***********')
-                logging.info('Automation Test Link found: %s-> Mirror:%s, Project:%s, Date:%s, Locale:%s' % (downloadlink, dumpsdomain, project, date, locale))
-                sys.exit(0)
             print ('-' * 50, '\n', 'Preparing to download', '\n', '-' * 50)
             time.sleep(1)  # ctrl-c
             print(downloadlink)

@@ -51,7 +51,7 @@ for ((k = 0; k < ${#projects[@]}; k++))
 do
 for ((l = 0; l < ${#locales[@]}; l++))
 do
-python wdcli.py -m $m -d ${dates[j]} -p ${projects[k]} -l ${locales[l]} -r 5 -f 0
+python wdcli.py -m $m -d ${dates[j]} -p ${projects[k]} -l ${locales[l]} -r 1 -s
 done
 done
 done
