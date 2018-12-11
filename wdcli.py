@@ -278,11 +278,11 @@ def main():
     # dates, pass only one or nothing as options in int
     parser.add_argument('-d', '--dates', nargs='?', type=int, help='Set the date of the dumps. (e.g. 20181101). Default = 1st day of current month', required=False)
     # projects, pass 1 or more as options in string
-    parser.add_argument('-p', '--projects', help='Choose which wikimedia projects to download (e.g. wiki wikibooks wiktionary wikimedia wikinews wikiversity wikiquote wikisource wikivoyage)', required=False)
+    parser.add_argument('-p', '--projects', nargs='*', help='Choose which wikimedia projects to download (e.g. wiki wikibooks wiktionary wikimedia wikinews wikiversity wikiquote wikisource wikivoyage)', required=False)
     # maxretries, pass one or nothing as options in int
     parser.add_argument('-r', '--maxretries', nargs='?', type=int, help='Max retries to download a dump when md5sum doesn\'t fit. Default: 3', required=False)
     # locales, pass one or more as options in str
-    parser.add_argument('-l', '--locales', help='Choose which language dumps to download (e.g en my ar)', required=False)
+    parser.add_argument('-l', '--locales', nargs='*', help='Choose which language dumps to download (e.g en my ar)', required=False)
     # script-testing, if -s options is passed, dumps link status return without download file
     parser.add_argument('-s', '--script', help="For automated testing using script that will return link status in output file", action='store_true')
     args = parser.parse_args()
@@ -409,6 +409,7 @@ def main():
         for locale, project, date in fulldumps:
             print ('-' * 50, '\n', 'Preparing to download', '\n', '-' * 50)
             time.sleep(1)  # ctrl-c
+            downloadlink = '{}/{}{}/{}'.format(dumpsdomain, locale, project, date)
             print(downloadlink)
             with urlopen(downloadlink, context=get_context()) as url:
                 htmlproj = url.read().decode('utf-8')
@@ -440,7 +441,6 @@ def main():
                     else:
                         logging.info("md5sums link found")
 
-                    # print (urldumps)
                     for urldump in urldumps:
                         dumpfilename = urldump.split('/')[-1]
                         # start download the dumps

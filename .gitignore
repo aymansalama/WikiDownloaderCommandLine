@@ -1,4 +1,14 @@
+# exclude download files
+Download/*
+DownloadTorrent/*
 
+# md5sums
+md5
+
+# logfile should not be updated
+logfile.txt
+
+# pycharm and vscode cache
 *.vscode
 *.pyc
 *.pyc
