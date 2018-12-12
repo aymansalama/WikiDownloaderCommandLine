@@ -101,7 +101,7 @@ def select_dates(date):
             print('Your date might be incorrect somewhere. Try again.\n')
         else:
             break
-    # user that knows how to rtfm 
+    # user that knows how to rtfm
     return str(date).replace('-','')
 
 # Set Projects function
@@ -115,15 +115,16 @@ def select_projects(project):
     while True:
         if project is None:
             project = input('Select projects:\n' + project_string + '(leave empty for default)\n').split()
-
+            print(project)
             # empty input = default (all projects)
             if not project:
                 return projects
             else:
                 pass
-        # if user state any projects     
+        # if user state any projects
         else:
             # project name must be a string
+            [project] = project
             if type(project) is str:
                 project = project.split(' ')
             # check project given by user
@@ -149,6 +150,7 @@ def select_locale(locale):
                 pass
         # user pass their own choice of locale(s)
         else:
+            [locale] = locale
             if type(locale) is str:
                 locale = locale.split(' ')
             # check locale given by user
@@ -177,7 +179,7 @@ def checkLocale(locale):
 # Direct Download dumps function
 # url_link is the file link from the server
 # path is download directory to save the file
-# dumpfilename is derived from the dumps file name 
+# dumpfilename is derived from the dumps file name
 def DownloadFile(url_link, path, dumpfilename):
     done = 0
     total = 0
@@ -185,7 +187,7 @@ def DownloadFile(url_link, path, dumpfilename):
     # error handling in case the link does not work
     try:
         url = requests.get(url_link, stream = True)
-        # to use as total percentage counter when downloading the file 
+        # to use as total percentage counter when downloading the file
         total = float(url.headers.get('content-length'))
     except:
         print('link not found')
@@ -215,7 +217,7 @@ def DownloadTorrentFile(url_link, path):
     # error handling in case the link does not work
     try:
         url = requests.get(url_link, stream = True)
-        # to use as total percentage counter when downloading the file 
+        # to use as total percentage counter when downloading the file
         total = float(url.headers.get('content-length'))
     except:
         print('link not found')
@@ -271,9 +273,9 @@ def get_context():
 def main():
     # setup arguments
     parser = argparse.ArgumentParser(description='Downloader of Wikimedia Dumps')
-    # mirror, pass only one or nothing as options in int 
+    # mirror, pass only one or nothing as options in int
     parser.add_argument('-m', '--mirrors', nargs='?', type=int, help='Use mirror links instead of wikimedia. Such as 1:https://dumps.wikimedia.your.org 2:http://wikipedia.c3sl.ufpr.br', required=False)
-    # torrent, if -t options is passed. mirror will use torrent 
+    # torrent, if -t options is passed. mirror will use torrent
     parser.add_argument('-t', '--torrent', help="Use torrent to download data", action='store_true')
     # dates, pass only one or nothing as options in int
     parser.add_argument('-d', '--dates', nargs='?', type=int, help='Set the date of the dumps. (e.g. 20181101). Default = 1st day of current month', required=False)
@@ -307,7 +309,7 @@ def main():
 
     # Set the locale
     locale = select_locale(args.locales)
-    
+
     # Show users all the selected options
     print ('-' * 50, '\n', 'Checking')
     print("Max retries set to:", maxretries)
@@ -426,8 +428,8 @@ def main():
                     urldumps = []
                     for match in re.finditer(m, htmlproj):
                         urldumps.append('%s/%s' % (dumpsdomain, match.group('urldump')))
-                    
-                    # Download Directory 
+
+                    # Download Directory
                     path = 'Download/%s/%s%s' % (locale, locale, project)
 
                     # Create downloads folder
@@ -457,6 +459,6 @@ def main():
                             # remove corrupted file
                             os.remove('%s/%s' % (path, dumpfilename))
 
-                            
+
 if __name__ == '__main__':
     main()
