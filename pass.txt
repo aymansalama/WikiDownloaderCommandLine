@@ -1,0 +1,2 @@
+2018/12/13 04:40:51 PM Pass Automation Test Link: https://dumps.wikimedia.org/enwikibooks/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikibooks, Date:20181101, Locale:en
+2018/12/13 04:40:53 PM Pass Automation Test Link: https://dumps.wikimedia.org/afwikibooks/20181101-> Mirror:https://dumps.wikimedia.org, Project:wikibooks, Date:20181101, Locale:af
