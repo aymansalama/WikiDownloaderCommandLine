@@ -17,7 +17,24 @@ import hashlib
 import logging
 
 # Logging with append mode into logfile.txt
-logging.basicConfig(filename='logfile.txt', filemode='a', format='%(asctime)s %(message)s', datefmt='%Y/%m/%d %I:%M:%S %p', level=logging.INFO)
+def setup_logger(logger_name, log_file, file_mode, level=logging.INFO):
+    l = logging.getLogger(logger_name)
+    formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%Y/%m/%d %I:%M:%S %p')
+    fileHandler = logging.FileHandler(log_file, mode=file_mode)
+    fileHandler.setFormatter(formatter)
+    streamHandler = logging.StreamHandler()
+    streamHandler.setFormatter(formatter)
+
+    l.setLevel(level)
+    l.addHandler(fileHandler)
+    l.addHandler(streamHandler)  
+    
+setup_logger('log', 'logfile.txt', 'a')
+setup_logger('pass', 'pass.txt', 'a')
+setup_logger('fail', 'fail.txt', 'a')
+logger_log = logging.getLogger('log')
+logger_pass = logging.getLogger('pass')
+logger_fail = logging.getLogger('fail')
 
 # init of global variables
 # List of mirrors
@@ -202,7 +219,7 @@ def DownloadFile(url_link, path, dumpfilename):
                 f.write(chunk)
                 sys.stdout.write('\r%s [%.2f]' % (dumpfilename, done*100/total))
         # log when complete download a dump file
-        logging.info('%s [Completed]' % (dumpfilename))
+        logger_log.info('%s [Completed]' % (dumpfilename))
         print('\n%s [Completed]' % (dumpfilename))
         return True
 
@@ -393,12 +410,12 @@ def main():
                     fulldumps.append([l,p,dates])   # live link will be added to array
                     print(downloadlink, '--  Link Ready')
                     if args.script:
-                        logging.info('Pass Automation Test Link: %s-> Mirror:%s, Project:%s, Date:%s, Locale:%s' % (downloadlink, dumpsdomain, p, dates, l))
+                        logger_pass.info('Pass Automation Test Link: %s-> Mirror:%s, Project:%s, Date:%s, Locale:%s' % (downloadlink, dumpsdomain, p, dates, l))
                         sys.exit(0)
                 except HTTPError:
                     print(downloadlink, '--  Not Exist')
                     if args.script:
-                        logging.error('Error Automation Test Link: %s-> Mirror:%s, Project:%s, Date:%s, Locale:%s' % (downloadlink, dumpsdomain, p, dates, l))
+                        logger_fail('Error Automation Test Link: %s-> Mirror:%s, Project:%s, Date:%s, Locale:%s' % (downloadlink, dumpsdomain, p, dates, l))
                         sys.exit(0)
 
         # Exit application if no file can be download
@@ -439,9 +456,9 @@ def main():
                     # Get MD5Sums from wikimedia related to the dumps that will are downloaded
                     md5raw = GetMD5sums('%s/%s%s/%s/%s%s-%s-md5sums.txt' % (dumpsdomain, locale, project, date, locale, project, date))
                     if not md5raw:
-                        logging.error("md5sums link not found")
+                        logger_log.error("md5sums link not found")
                     else:
-                        logging.info("md5sums link found")
+                        logger_log.info("md5sums link found")
 
                     for urldump in urldumps:
                         dumpfilename = urldump.split('/')[-1]
@@ -451,11 +468,11 @@ def main():
                         # md5check
                         if MatchMD5('%s/%s' % (path, dumpfilename), md5raw):
                             # log info
-                            logging.info("Matching MD5")
+                            logger_log.info("Matching MD5")
                             corrupted = False
                         else:
                             # md5 not match , log error
-                            logging.error("Not matching MD5")
+                            logger_log.error("Not matching MD5")
                             # remove corrupted file
                             os.remove('%s/%s' % (path, dumpfilename))
 
